@@ -6,14 +6,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 model User {
   id        String @id @default(uuid())
   fullName  String
-  cpf       String @unique
+  cpf       String @unique(map: "user_cpf_unique")
   birthDate DateTime
   phone     String
-  email     String @unique
+  email     String @unique(map: "user_email_unique")
   password  String
   active    Boolean
   createdAt DateTime @default(now())

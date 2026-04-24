@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class CreateUserDto {
+export class UpdateUserDto {
   @IsString()
   @IsNotEmpty(
     {message: 'Nome não pode ser vazio',})
@@ -49,5 +49,5 @@ export class CreateUserDto {
   password!: string;
 
   @IsBoolean()
-  active!: string;
+  active!: boolean;
 }

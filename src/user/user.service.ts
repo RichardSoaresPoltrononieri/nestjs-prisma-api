@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service"
 import { Prisma, User } from "@prisma/client"
 
@@ -6,18 +6,48 @@ import { Prisma, User } from "@prisma/client"
 export class UserService {
     constructor(private prisma: PrismaService) { }
 
-    async getAllUsers(): Promise<User[]> {
-        return this.prisma.user.findMany();
+    async getAllUsers(): Promise<
+        Pick<User, 'id' | 'fullName' | 'email' | 'cpf' | 'active' | 'createdAt' | 'updatedAt'>[]
+    > {
+        return this.prisma.user.findMany({
+            select: {
+                id: true,
+                fullName: true,
+                email: true,
+                cpf: true,
+                active: true,
+                createdAt: true,
+                updatedAt: true,
+            },
+        });
     }
 
-    async getUserById(id: string): Promise<User | null> {
-        return this.prisma.user.findUnique({
-            where: {
-                id
-            }
-        })
+    async getUserById(
+        id: string,
+    ): Promise<
+        Pick<User, 'id' | 'fullName' | 'email' | 'cpf' | 'active' | 'createdAt' | 'updatedAt'>
+    > {
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                fullName: true,
+                email: true,
+                cpf: true,
+                active: true,
+                createdAt: true,
+                updatedAt: true,
+            },
+        });
+
+        if (!user) {
+            throw new NotFoundException('Usuário não encontrado');
+        }
+
+        return user;
     }
-    async createUser(data: Prisma.UserCreateInput): Promise<Pick<User, "id" | "fullName" | "email" | "cpf" | "active" | "createdAt">> {
+
+    async createUser(data: Prisma.UserCreateInput) {
         return this.prisma.user.create({
             data,
             select: {
@@ -29,22 +59,55 @@ export class UserService {
                 createdAt: true,
             },
         });
+
     }
 
-    async updateUser(id: string, data: User): Promise<User> {
+    async updateUser(
+        id: string,
+        data: Prisma.UserUpdateInput,
+    ): Promise<
+        Pick<User, 'id' | 'fullName' | 'email' | 'cpf' | 'active' | 'updatedAt'>
+    > {
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+        });
+
+        if (!user) {
+            throw new NotFoundException('Usuário não encontrado');
+        }
+
         return this.prisma.user.update({
-            where: {
-                id
+            where: { id },
+            data,
+            select: {
+                id: true,
+                fullName: true,
+                email: true,
+                cpf: true,
+                active: true,
+                updatedAt: true,
             },
-            data
-        })
+        });
     }
 
-    async deleteUser(id: string): Promise<User> {
+    async deleteUser(
+        id: string,
+    ): Promise<Pick<User, 'id' | 'fullName' | 'email'>> {
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+        });
+
+        if (!user) {
+            throw new NotFoundException('Usuário não encontrado');
+        }
+
         return this.prisma.user.delete({
-            where: {
-                id
-            }
+            where: { id },
+            select: {
+                id: true,
+                fullName: true,
+                email: true,
+            },
         });
     }
 }

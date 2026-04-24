@@ -11,10 +11,12 @@ import { Type } from 'class-transformer';
 
 export class CreateUserDto {
   @IsString()
-  @IsNotEmpty()
-  fullName!: string;
+  @IsNotEmpty(
+    {message: 'Nome não pode ser vazio',})
+    fullName!: string;
 
   @IsString()
+  @IsNotEmpty()
   @Matches(/^\d{11}$/, {
     message: 'CPF deve conter 11 dígitos numéricos',
   })
@@ -22,6 +24,8 @@ export class CreateUserDto {
 
   @Type(() => Date)
   @IsDate()
+  @IsNotEmpty(
+    {message: 'Data de nascimento não pode ser vazio',})
   birthDate!: Date;
 
   @IsString()
@@ -31,14 +35,19 @@ export class CreateUserDto {
   phone!: string;
 
   @IsEmail()
+  @IsNotEmpty(
+    (
+    {message: 'Email não pode ser vazio',})
+  )
   email!: string;
 
   @IsString()
+  @IsNotEmpty()
   @MinLength(6, {
     message: 'Senha deve ter no mínimo 6 caracteres',
   })
   password!: string;
 
   @IsBoolean()
-  active!: boolean;
+  active!: string;
 }
